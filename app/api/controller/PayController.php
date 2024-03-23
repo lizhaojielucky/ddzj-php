@@ -21,14 +21,14 @@ namespace app\api\controller;
 
 
 use app\common\enum\user\UserTerminalEnum;
+use app\common\service\AliPayService;
 use app\common\service\WeChatPayService;
 use app\api\logic\PayLogic;
 use app\api\validate\PayValidate;
 
 class PayController extends BaseShopController
 {
-    public array $notNeedLogin = ['notifyMnp','notifyOa'];
-
+    public array $notNeedLogin = ['notifyMnp','notifyOa','aliNotify'];
 
     /**
      * @notes 支付方式
@@ -87,5 +87,39 @@ class PayController extends BaseShopController
     public function notifyOa()
     {
         return (new WeChatPayService(UserTerminalEnum::WECHAT_OA))->notify();
+    }
+
+    /**
+     * @notes 支付宝回调
+     * @return bool
+     * @author 段誉
+     * @date 2021/8/13 14:16
+     */
+    public function aliNotify()
+    {
+        $params = $this->request->post();
+        $result = (new AliPayService())->notify($params);
+        if (true === $result) {
+            echo 'success';
+        } else {
+            echo 'fail';
+        }
+    }
+
+    /**
+     * @notes 获取支付结果
+     * @return \think\response\Json
+     * @author ljj
+     * @date 2024/3/21 5:49 下午
+     */
+    public function getPayResult()
+    {
+        $params = (new PayValidate())->get()->goCheck('getPayResult');
+        //支付流程
+        $result = PayLogic::getPayResult($params);
+        if (false === $result) {
+            return $this->fail(PayLogic::getError());
+        }
+        return $this->success('', $result);
     }
 }

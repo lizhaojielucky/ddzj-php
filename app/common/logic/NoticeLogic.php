@@ -81,7 +81,7 @@ class NoticeLogic extends BaseLogic
             $params['params']['create_time'] = $order['create_time'];
             $params['params']['pay_time'] = $order['pay_time'];
             $params['params']['order_amount'] = $order['order_amount'];
-
+            $params['params']['mobile'] = $order['mobile'];
             $params['params']['time'] = $order['appoint_time'].' '.$order['appoint_week'].' '.$order['door_time'];
         }
         // 用户相关

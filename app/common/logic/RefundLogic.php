@@ -19,11 +19,13 @@
 
 namespace app\common\logic;
 
-
+use app\common\enum\OrderEnum;
 use app\common\enum\OrderRefundEnum;
 use app\common\enum\PayEnum;
+use app\common\model\order\Order;
 use app\common\model\order\OrderRefund;
 use app\common\model\order\OrderRefundLog;
+use app\common\service\AliPayService;
 use app\common\service\WeChatConfigService;
 use app\common\service\WeChatPayService;
 
@@ -57,6 +59,10 @@ class RefundLogic extends BaseLogic
             //微信退款
             case PayEnum::WECHAT_PAY:
                 $this->wechatRefund($order,$refund_amount);
+                break;
+            //支付宝退款
+            case PayEnum::ALI_PAY:
+                $this->alipayRefund($order,$refund_amount);
                 break;
         }
 
@@ -140,6 +146,35 @@ class RefundLogic extends BaseLogic
                 'refund_status' => OrderRefundEnum::STATUS_FAIL,
             ], ['id'=>$this->refund->id]);
         }
+
+        return true;
+    }
+
+    /**
+     * @notes 支付宝退款
+     * @param $order
+     * @param $refund_amount
+     * @return bool
+     * @throws \Exception
+     * @author ljj
+     * @date 2024/3/21 4:55 下午
+     */
+    public function alipayRefund($order,$refund_amount)
+    {
+        //原路退回到支付宝的情况
+        $result = (new AliPayService())->refund($order['sn'], $refund_amount, $this->refund_log->sn);
+        $result = (array)$result;
+
+        //更新退款日志记录
+        OrderRefundLog::update([
+            'refund_status' => ($result['code'] == '10000' && $result['msg'] == 'Success' && $result['fundChange'] == 'Y') ? 1 : 2,
+            'refund_msg' => json_encode($result, JSON_UNESCAPED_UNICODE),
+        ], ['id'=>$this->refund_log->id]);
+
+        //更新订单退款状态
+        OrderRefund::update([
+            'refund_status' => ($result['code'] == '10000' && $result['msg'] == 'Success' && $result['fundChange'] == 'Y') ? 1 : 2,
+        ], ['id'=>$this->refund->id]);
 
         return true;
     }

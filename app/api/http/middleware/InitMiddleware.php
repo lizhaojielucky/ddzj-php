@@ -78,6 +78,7 @@ class InitMiddleware
         $noCheck = [
             'Pay/notifyMnp',
             'Pay/notifyOa',
+            'Pay/aliNotify',
         ];
         $requestAction = $request->controller() . '/'. $request->action();
         return in_array($requestAction, $noCheck);

@@ -86,6 +86,23 @@ class PayConfigValidate extends BaseValidate
                 return '微信支付证书密钥不能为空';
             }
         }
+        if ($result['pay_way'] == PayEnum::ALI_PAY) {
+//            if (!isset($data['mode']) || empty($data['mode'])) {
+//                return '模式不能为空';
+//            }
+            if (!isset($data['merchant_type']) || empty($data['merchant_type'])) {
+                return '商户类型不能为空';
+            }
+            if (!isset($data['app_id']) || empty($data['app_id'])) {
+                return '应用ID不能为空';
+            }
+            if (!isset($data['private_key']) || empty($data['private_key'])) {
+                return '应用私钥不能为空';
+            }
+            if (!isset($data['ali_public_key']) || empty($data['ali_public_key'])) {
+                return '支付宝公钥不能为空';
+            }
+        }
 
         return true;
     }

@@ -38,7 +38,7 @@ class UserController extends BaseShopController
      */
     public function center()
     {
-        $result = (new UserLogic())->center($this->userId);
+        $result = (new UserLogic())->center($this->userInfo);
         return $this->success('',$result);
     }
 

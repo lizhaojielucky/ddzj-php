@@ -23,6 +23,7 @@ namespace app\api\logic;
 use app\common\enum\notice\NoticeEnum;
 use app\common\enum\OrderEnum;
 use app\common\enum\user\UserTerminalEnum;
+use app\common\enum\YesNoEnum;
 use app\common\logic\BaseLogic;
 use app\common\model\decorate\DecoratePage;
 use app\common\model\goods\Goods;
@@ -40,18 +41,25 @@ class UserLogic extends BaseLogic
 {
     /**
      * @notes 用户中心
-     * @param $user_id
+     * @param $userInfo
      * @return array
      * @author ljj
      * @date 2022/2/23 5:24 下午
      */
-    public function center($user_id)
+    public function center($userInfo)
     {
+        $user_id = $userInfo['user_id'] ?? 0;
+        $terminal = $userInfo['terminal'] ?? 0;
         $user = User::where(['id'=>$user_id])
             ->field('id,nickname,avatar,mobile,sex,create_time,is_new_user')
             ->findOrEmpty()
             ->toArray();
-
+        //支付是否需要授权
+        $user['pay_auth'] = 0;
+        if (in_array($terminal, [UserTerminalEnum::WECHAT_MMP, UserTerminalEnum::WECHAT_OA])) {
+            $auth = self::hasWechatAuth($user_id);
+            $user['pay_auth'] = $auth ? YesNoEnum::NO : YesNoEnum::YES;
+        }
         // 装修配置
         $user['decorate_page'] = DecoratePage::where('id',2)->json(['data'],true)->value('data');
 

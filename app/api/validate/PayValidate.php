@@ -53,6 +53,10 @@ class PayValidate extends BaseValidate
             ->append('order_id','checkOrder');
     }
 
+    public function sceneGetPayResult()
+    {
+        return $this->only(['from', 'order_id']);
+    }
 
     /**
      * @notes 检验订单id

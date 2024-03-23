@@ -28,6 +28,7 @@ use app\common\model\order\Order;
 use app\common\model\pay\PayWay;
 use app\common\model\RechargeOrder;
 use app\common\model\user\User;
+use app\common\service\AliPayService;
 use app\common\service\BalancePayService;
 use app\common\service\ConfigService;
 use app\common\service\WeChatPayService;
@@ -153,6 +154,10 @@ class PayLogic extends BaseLogic
                     PayNotifyLogic::handle($from, $order['sn']);
                 }
                 break;
+            case PayEnum::ALI_PAY:
+                $payService = (new AliPayService($terminal));
+                $result = $payService->pay($from, $order);
+                break;
             default:
                 self::$error = '订单异常';
                 $result = false;
@@ -162,6 +167,42 @@ class PayLogic extends BaseLogic
         if (false === $result && !self::hasError()) {
             self::setError($payService->getError());
         }
+        return $result;
+    }
+
+    /**
+     * @notes 获取支付结果
+     * @param $params
+     * @return array
+     * @author ljj
+     * @date 2024/3/21 5:48 下午
+     */
+    public static function getPayResult($params)
+    {
+        switch ($params['from']) {
+            case 'order' :
+                $result = Order::where(['id' => $params['order_id']])
+                    ->field(['id', 'sn', 'pay_time', 'pay_way', 'order_amount', 'pay_status'])
+                    ->findOrEmpty()
+                    ->toArray();
+                $result['total_amount'] = '￥' . $result['order_amount'];
+                break;
+            case 'recharge' :
+                $result = RechargeOrder::where(['id' => $params['order_id']])
+                    ->field(['id','sn','pay_time','pay_way','order_amount','pay_status'])
+                    ->findOrEmpty()
+                    ->toArray();
+                $result['total_amount'] = '￥' . $result['order_amount'];
+                break;
+            default :
+                $result = [];
+        }
+
+        if (empty($result)) {
+            self::$error = '订单信息不存在';
+        }
+
+        $result['pay_way_desc'] = PayEnum::getPayTypeDesc($result['pay_way']);
         return $result;
     }
 }

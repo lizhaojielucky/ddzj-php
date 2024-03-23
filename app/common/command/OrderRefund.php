@@ -29,6 +29,7 @@ use app\common\logic\AccountLogLogic;
 use app\common\model\order\Order;
 use app\common\model\order\OrderRefundLog;
 use app\common\model\user\User;
+use app\common\service\AliPayService;
 use app\common\service\WeChatConfigService;
 use app\common\service\WeChatPayService;
 use think\console\Command;
@@ -135,7 +136,34 @@ class OrderRefund extends Command
                                 'order_id' => $val['order_id']
                             ]
                         ]);
+                        break;
+                    //支付宝退款
+                    case PayEnum::ALI_PAY:
+                        //原路退回到支付宝的情况
+                        $result = (new AliPayService())->refund($val['order_sn'], $val['refund_amount'], $val['sn']);
+                        $result = (array)$result;
 
+                        //更新退款日志记录
+                        OrderRefundLog::update([
+                            'refund_status' => ($result['code'] == '10000' && $result['msg'] == 'Success' && $result['fundChange'] == 'Y') ? 1 : 2,
+                            'refund_msg' => json_encode($result, JSON_UNESCAPED_UNICODE),
+                        ], ['id'=>$val['refund_log_id']]);
+
+                        //更新订单退款状态
+                        \app\common\model\order\OrderRefund::update([
+                            'refund_status' => ($result['code'] == '10000' && $result['msg'] == 'Success' && $result['fundChange'] == 'Y') ? 1 : 2,
+                        ], ['id'=>$val['refund_id']]);
+
+                        if ($result['code'] == '10000' && $result['msg'] == 'Success' && $result['fundChange'] == 'Y') {
+                            // 订单退款成功 - 通知买家
+                            event('Notice', [
+                                'scene_id' =>  NoticeEnum::REFUND_SUCCESS_NOTICE,
+                                'params' => [
+                                    'user_id' => $val['user_id'],
+                                    'order_id' => $val['order_id']
+                                ]
+                            ]);
+                        }
                         break;
                 }
 

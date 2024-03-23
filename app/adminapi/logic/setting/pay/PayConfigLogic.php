@@ -70,6 +70,15 @@ class PayConfigLogic extends BaseLogic
                 'apiclient_key' => $params['apiclient_key'],
             ];
         }
+        if ($pay_config['pay_way'] == PayEnum::ALI_PAY) {
+            $config = [
+                'mode' => $params['mode'] ?? 'normal_mode',
+                'merchant_type' => $params['merchant_type'],
+                'app_id' => $params['app_id'],
+                'private_key' => $params['private_key'],
+                'ali_public_key' => $params['ali_public_key'],
+            ];
+        }
         $pay_config->name = $params['name'];
         $pay_config->image = $params['image'];
         $pay_config->sort = $params['sort'];
