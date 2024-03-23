@@ -1,0 +1,1 @@
+import{Z as o}from"./index.5b37717f.js";const t=t=>o.get({url:"/goods/detail",data:t}),a=t=>o.post({url:"/goods/collect",data:t}),s=()=>o.get({url:"/goods/appointTime"}),e=t=>o.get({url:"/goods_comment/lists",data:t}),d=t=>o.get({url:"/goods_comment/commentCategory",data:t});export{t as a,a as b,s as c,e as d,d as e};

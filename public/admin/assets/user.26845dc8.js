@@ -1,0 +1,1 @@
+import{r as e}from"./index.7e7d93d0.js";function n(){return e.get({url:"/setting.user.user/getConfig"})}function s(t){return e.post({url:"/setting.user.user/setConfig",params:t})}function i(){return e.get({url:"/setting.user.user/getRegisterConfig"})}function u(t){return e.post({url:"/setting.user.user/setRegisterConfig",params:t})}export{i as a,u as b,n as c,s as d};
