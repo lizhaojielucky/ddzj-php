@@ -142,9 +142,9 @@ class OrderValidate extends BaseValidate
             return '订单不允许取消';
         }
 
-        if ($result['order_type'] == OrderEnum::ORDER_TYPE_SYSTEM){
-            return '系统订单不允许取消';
-        }
+//        if ($result['order_type'] == OrderEnum::ORDER_TYPE_SYSTEM){
+//            return '系统订单不允许取消';
+//        }
 
         return true;
     }

@@ -95,7 +95,7 @@ class IndexLogic extends BaseLogic
             Array_push($categoryIds,$category['id']);
             $category['goods'] = Goods::where(['category_id' => $categoryIds,'status'=>DefaultEnum::SHOW])
                 ->field('id,name,unit_id,image,price')
-                ->order(['sort'=>'asc','id'=>'desc'])
+                ->order(['sort'=>'desc','id'=>'desc'])
                 ->append(['unit_desc'])
                 ->limit(3)
                 ->select()->toArray();

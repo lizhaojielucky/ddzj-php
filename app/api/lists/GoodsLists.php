@@ -51,6 +51,7 @@ class GoodsLists extends BaseShopDataLists
             ->append(['unit_desc'])
             ->withSearch($this->setSearch(), $this->params)
             ->where(['status'=>GoodsEnum::SHELVE])
+            ->order(['sort'=>'desc','id'=>'desc'])
             ->limit($this->limitOffset, $this->limitLength)
             ->select()
             ->toArray();
