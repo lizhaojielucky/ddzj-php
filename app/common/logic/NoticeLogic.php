@@ -46,14 +46,19 @@ class NoticeLogic extends BaseLogic
             if (empty($noticeSetting)) {
                 throw new \Exception('找不到对应场景的配置');
             }
+            $mobile = $params['params']['mobile'] ?? '';
             // 合并额外参数
-            $params = self::mergeParams($params);
+            $mergeParams = self::mergeParams($params);
+            if (!empty($mobile)) {
+                $mergeParams['params']['mobile'] = $mobile;
+            }
+
             $res = false;
             self::setError('发送通知失败');
 
             // 短信通知
             if (isset($noticeSetting['sms_notice']['status']) && $noticeSetting['sms_notice']['status'] == YesNoEnum::YES) {
-                $res = (new SmsMessageService())->send($params);
+                $res = (new SmsMessageService())->send($mergeParams);
             }
 
             return $res;
@@ -96,7 +101,7 @@ class NoticeLogic extends BaseLogic
         if (!empty($params['params']['staff_id'])) {
             $staff = Staff::findOrEmpty($params['params']['staff_id'])->toArray();
             $params['params']['staff_name'] = $staff['name'];
-            $params['params']['mobile'] = $params['params']['mobile'] ?? $staff['mobile'];
+            $params['params']['mobile'] =  $staff['mobile']??$params['params']['mobile'] ;
         }
 
         // 跳转路径

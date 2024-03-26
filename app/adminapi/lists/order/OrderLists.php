@@ -41,7 +41,7 @@ class OrderLists extends BaseAdminDataLists implements ListsExtendInterface
             $where[] = ['o.sn','like','%'.$params['order_info'].'%'];
         }
         if (isset($params['user_info']) && $params['user_info'] != '') {
-            $where[] = ['u.sn|u.nickname|u.account','like','%'.$params['user_info'].'%'];
+            $where[] = ['u.sn|u.nickname|u.account|u.mobile','like','%'.$params['user_info'].'%'];
         }
         if (isset($params['goods_info']) && $params['goods_info'] != '') {
             $where[] = ['g.name','like','%'.$params['goods_info'].'%'];
@@ -54,6 +54,11 @@ class OrderLists extends BaseAdminDataLists implements ListsExtendInterface
         }
         if (isset($params['end_time']) && $params['end_time'] != '') {
             $where[] = ['o.create_time','<=',strtotime($params['end_time'])];
+        }
+        if (isset($params['finish_start_time']) && isset($params['finish_end_time'])
+            && $params['finish_start_time']!='' && $params['finish_end_time']!=''){
+            $where[] = ['o.finish_time','>=',strtotime($params['finish_start_time'])];
+            $where[] = ['o.finish_time','<=',strtotime($params['finish_end_time'])];
         }
         if (isset($params['staff_info']) && $params['staff_info'] != '') {
             $where[] = ['s.name','like','%'.$params['staff_info'].'%'];

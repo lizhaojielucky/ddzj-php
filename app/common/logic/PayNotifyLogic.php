@@ -93,15 +93,37 @@ class PayNotifyLogic extends BaseLogic
 
         // 订单付款通知 - 通知卖家
         $mobile = ConfigService::get('website', 'mobile');
-        if (!empty($mobile)) {
-            event('Notice', [
-                'scene_id' =>  NoticeEnum::ORDER_PAY_NOTICE_PLATFORM,
-                'params' => [
-                    'mobile' => $mobile,
-                    'order_id' => $order['id']
-                ]
-            ]);
+        if (!empty($mobile)){
+            if (strpos($mobile, ',') !== false) {
+                $mobile = explode(',', $mobile);
+                foreach ($mobile as $v) {
+                    event('Notice', [
+                        'scene_id' =>  NoticeEnum::ORDER_PAY_NOTICE_PLATFORM,
+                        'params' => [
+                            'mobile' => $v,
+                            'order_id' => $order['id']
+                        ]
+                    ]);
+                }
+            }else{
+                event('Notice', [
+                    'scene_id' =>  NoticeEnum::ORDER_PAY_NOTICE_PLATFORM,
+                    'params' => [
+                        'mobile' => $mobile,
+                        'order_id' => $order['id']
+                    ]
+                ]);
+            }
         }
+//        if (!empty($mobile)) {
+//            event('Notice', [
+//                'scene_id' =>  NoticeEnum::ORDER_PAY_NOTICE_PLATFORM,
+//                'params' => [
+//                    'mobile' => $mobile,
+//                    'order_id' => $order['id']
+//                ]
+//            ]);
+//        }
     }
 
 
